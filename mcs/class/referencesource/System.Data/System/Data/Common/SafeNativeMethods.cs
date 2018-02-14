@@ -36,10 +36,16 @@ namespace System.Data.Common {
         [ResourceExposure(ResourceScope.None)]
         static internal extern int GetUserDefaultLCID();
 
-        [DllImport(ExternDll.Kernel32, PreserveSig=true)]
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-        [ResourceExposure(ResourceScope.None)]
-        static internal extern void ZeroMemory(IntPtr dest, IntPtr length);
+//        [DllImport(ExternDll.Kernel32, PreserveSig=true)]
+//        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+//        [ResourceExposure(ResourceScope.None)]
+//        static internal extern void ZeroMemory(IntPtr dest, IntPtr length);
+        internal static void ZeroMemory(IntPtr ptr, IntPtr length)
+        {
+            var zeroes = new byte[(int)length];
+            Marshal.Copy(zeroes, 0, ptr, (int)length);
+        }
+
 
         // <WARNING>
         // Using the int versions of the Increment() and Decrement() methods is correct.
@@ -86,15 +92,27 @@ namespace System.Data.Common {
         [ResourceExposure(ResourceScope.None)]
         static internal extern IntPtr GetProcAddress(IntPtr HModule, [MarshalAs(UnmanagedType.LPStr), In] string funcName/*lpcstr*/);
 
-        [DllImport(ExternDll.Kernel32, SetLastError=true)]
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-        [ResourceExposure(ResourceScope.None)]
-        static internal extern IntPtr LocalAlloc(int flags, IntPtr countOfBytes);
+//        [DllImport(ExternDll.Kernel32, SetLastError=true)]
+//        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+//        [ResourceExposure(ResourceScope.None)]
+//        static internal extern IntPtr LocalAlloc(int flags, IntPtr countOfBytes);
+        internal static IntPtr LocalAlloc(int flags, IntPtr initialSize)
+        {
+            var handle = Marshal.AllocHGlobal(initialSize);
+            ZeroMemory(handle, initialSize);
+            return handle;
+        }
 
-        [DllImport(ExternDll.Kernel32, SetLastError=true)]
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-        [ResourceExposure(ResourceScope.None)]
-        static internal extern IntPtr LocalFree(IntPtr handle);
+
+//        [DllImport(ExternDll.Kernel32, SetLastError=true)]
+//        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+//        [ResourceExposure(ResourceScope.None)]
+//        static internal extern IntPtr LocalFree(IntPtr handle);
+        internal static void LocalFree(IntPtr ptr)
+        {
+            Marshal.FreeHGlobal(ptr);
+        }
+
 
         [DllImport(ExternDll.Oleaut32, CharSet=CharSet.Unicode)]
         [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]            
