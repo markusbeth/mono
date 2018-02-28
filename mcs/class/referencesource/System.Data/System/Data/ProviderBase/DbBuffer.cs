@@ -74,9 +74,8 @@ namespace System.Data.ProviderBase
                 DangerousAddRef(ref mustRelease);
             
                 IntPtr ptr = ADP.IntPtrOffset(DangerousGetHandle(), offset);
-                int length = UnsafeNativeMethods.lstrlenW(ptr);
-                Validate(offset, (2*(length+1)));
-                value = Marshal.PtrToStringUni(ptr, length);
+                value = Marshal.PtrToStringUni(ptr);
+                Validate(offset, (2 * (value.Length + 1)));
             }
             finally {
                 if (mustRelease) {
